@@ -61,4 +61,18 @@ Las respuestas razonadas y las decisiones de cada reto están en [`REFLEXION.md`
 
 ## Evidencias
 
-Las capturas están en [`evidencias/`](evidencias/).
+Capturas tomadas con el backend real (Spring Boot + PostgreSQL, puerto 9090) y el frontend en `http://localhost:5173`.
+
+| # | Evidencia | Captura |
+|---|---|---|
+| 1 | React en el navegador: lista obtenida con Axios (GET), indicadores y filtros | ![](evidencias/01_react_lista_api.jpg) |
+| 2 | Reto 1 · Filtro combinado: carrera *Ingeniería en Sistemas* + valor *Teórico* → 2 de 13 | ![](evidencias/02_reto1_filtro_combinado.jpg) |
+| 3 | Reto 1 · Caso sin coincidencias (*Teología* + *Social*) | ![](evidencias/03_reto1_sin_coincidencias.jpg) |
+| 4 | Reto 3 · Búsqueda sin mayúsculas ni tildes: `JOSE` encuentra a *José Ruiz* | ![](evidencias/04_reto3_busqueda.jpg) |
+| 5 | Reto 4 · Validación en el cliente antes de enviar (carnet inválido, suma 260) | ![](evidencias/05_reto4_validacion_cliente.jpg) |
+| 6 | Reto 4 · POST con carnet repetido → **409 Conflict** con el mensaje del servidor | ![](evidencias/06_reto4_post_409_duplicado.jpg) |
+| 7 | Reto 4 · POST válido → **201 Created**; la lista y los indicadores se actualizan (14) | ![](evidencias/07_reto4_post_201_lista_actualizada.jpg) |
+| 8 | Respuesta del GET en Postman (`/api/v1/resultados?page=0&size=5&sort=id,asc` → 200 OK) | ![](evidencias/08_postman_get_resultados_200.jpg) |
+| 9 | **Error controlado**: Spring Boot detenido → mensaje claro y botón *Reintentar* | ![](evidencias/09_error_controlado_servidor_detenido.jpg) |
+| 10 | Reto 5 · Indicador de carga al reintentar | ![](evidencias/10_reto5_cargando.jpg) |
+| 11 | Reto 5 · Con el backend levantado de nuevo, *Reintentar* recupera los datos | ![](evidencias/11_reto5_reintentar_recupera.jpg) |
