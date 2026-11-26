@@ -1,75 +1,64 @@
-# React + TypeScript + Vite
+# gestion-academica-web — Clase práctica React (Semana 10)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend **React + TypeScript + Vite + Tailwind** del proyecto de grupo *Gestión Académica* (Servicios Web, UAM).
+Parte de la base `gestion-academica-web` entregada en clase y aplica la guía *“React desde cero hasta consumo de APIs”*: componentes con props, `useState`, `useEffect` con `AbortController` y **Axios** consumiendo la API de Spring Boot.
 
-Currently, two official plugins are available:
+El dominio es el **Test de Valores de Allport**. El backend es el del repositorio
+[`servicios-web-sesion8-dto-paginacion-allport`](https://github.com/Rrodrovan/servicios-web-sesion8-dto-paginacion-allport) (carpeta `backend/`, puerto **9090**).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Ejecutar
 
-## React Compiler
+1. Levantar el backend Spring Boot (`AllportApiApplication`, PostgreSQL `allport_db`) → `http://localhost:9090/api/v1/resultados`.
+2. En esta carpeta:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install        # o pnpm install
+npm run dev        # http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+- `VITE_API_BASE_URL=/api/v1` (`.env.development`) es la URL base de Axios.
+- El **proxy de Vite** (`vite.config.ts`) reenvía `/api` a `http://localhost:9090`; el navegador habla con el mismo origen (5173), así que en desarrollo no hay problema de CORS. El backend además permite `http://localhost:5173` en su `CorsConfig`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Estructura
 
 ```
+src/
+  App.tsx                                  Encabezado y página
+  shared/config/env.ts                     URL base desde variables de entorno
+  shared/api/httpClient.ts                 Instancia Axios (baseURL, timeout 8000) + ApiError + interceptor
+  shared/api/types.ts                      Formato de error del backend
+  features/resultados/
+    types.ts                               Tipos del contrato (Resultado, ResultadoNuevo, Pagina)
+    resultadosApi.ts                       GET paginado y POST (módulo de servicios, sin componentes)
+    useResultados.ts                       useEffect + AbortController, cargando / error / reintentar
+    calculos.ts                            Filtro combinado, normalización de texto, porcentaje seguro
+    ResultadosPage.tsx                     Composición: formulario, indicadores, filtros y lista
+    components/ResultadoCard.tsx           Tarjeta (props)
+    components/Filtros.tsx                 Búsqueda + carrera + valor dominante (componente controlado)
+    components/Indicadores.tsx             Totales y porcentajes por valor dominante
+    components/ResultadoForm.tsx           POST con validación y sin envíos duplicados
+    components/EstadoError.tsx             Error controlado con botón Reintentar
+```
+
+## Endpoints consumidos
+
+| Método | Ruta | Uso |
+|---|---|---|
+| GET | `/api/v1/resultados?page=0&size=50&sort=id,asc` | Lista paginada; el cliente recorre las páginas hasta `last = true` |
+| POST | `/api/v1/resultados` | Registra un resultado; responde **201** con el recurso creado |
+
+## Retos
+
+Las respuestas razonadas y las decisiones de cada reto están en [`REFLEXION.md`](REFLEXION.md).
+
+| Reto | Estado | Dónde |
+|---|---|---|
+| 1 · Filtro combinado (carrera + valor dominante, caso sin coincidencias) | ✅ | `calculos.ts`, `Filtros.tsx` |
+| 2 · Indicadores operativos (total y % por valor, sin dividir entre cero, arreglo vacío) | ✅ | `Indicadores.tsx` |
+| 3 · Búsqueda robusta (sin mayúsculas ni tildes, botón Limpiar) | ✅ | `calculos.ts`, `Filtros.tsx` |
+| 4 · Registro real mediante POST | ✅ | `ResultadoForm.tsx`, `resultadosApi.ts` |
+| 5 · Diseño y resiliencia (componentes, servicios, Reintentar, accesibilidad) | ✅ | `useResultados.ts`, `EstadoError.tsx` |
+
+## Evidencias
+
+Las capturas están en [`evidencias/`](evidencias/).
